@@ -2,7 +2,12 @@
   "name": "cb-final-project",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "mongodb": "^4.5.0",
+    "nodemon": "^2.0.15",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "5.0.0",
@@ -12,6 +17,7 @@
     "tippy.js": "^6.3.7"
   },
   "scripts": {
+    "dev:server": "nodemon server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject"
