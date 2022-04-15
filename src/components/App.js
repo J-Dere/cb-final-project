@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import styled from "styled-components";
 import { GlobalContext } from "./GlobalContext";
+import RecipesViewer from "./RecipesViewer";
 
 function App() {
   const { job, setJob } = useContext(GlobalContext);
@@ -21,6 +22,7 @@ function App() {
         <option value={13}>Weaver</option>
         <option value={14}>Alchemist</option>
       </select>
+      <RecipesViewer />
     </Wrapper>
   );
 }

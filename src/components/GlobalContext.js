@@ -1,5 +1,4 @@
 import { createContext, useEffect, useState, useReducer } from "react";
-import { SEARCH_QUERY, getItemsFromAPI, getRecipeFromID } from "./utils";
 export const GlobalContext = createContext();
 
 const initialEquipmentState = {
@@ -91,116 +90,58 @@ export const GlobalProvider = ({ children }) => {
   const [lv80Bucket, setlv80Bucket] = useState({});
   const [lv90Bucket, setlv90Bucket] = useState({});
 
+  const [activeRecipeId, setActiveRecipeId] = useState(null);
+  const [activeRecipe, setActiveRecipe] = useState(null);
+
   useEffect(() => {
-    const asyncInCallback = async () => {
-      if (job !== null) {
-        let queryString = "";
-        //set job in query
-        queryString = queryString.concat(`,ClassJob.ID=${job}`);
-
-        //Filtering requires multiple queries, maybe filter on data locally instead of through query?
-        //check books filters
-        // for (let i = 1; i < Object.values(booksFilters).length; i++) {
-        //   //if the don't check books flag is false
-        //   if (!Object.values(booksFilters)[0]) {
-        //     if (Object.values(booksFilters)[i]) {
-        //     }
-        //   } else {
-        //     queryString = queryString.concat(",SecretRecipeBook!!");
-        //   }
-        // }
-
-        const allRecipes = await getItemsFromAPI(
-          SEARCH_QUERY.concat(queryString)
-        );
-        // console.log("in use effect", Object.keys(allRecipes).length);
-        let temp50Bucket = {};
-        let temp60Bucket = {};
-        let temp70Bucket = {};
-        let temp80Bucket = {};
-        let temp90Bucket = {};
-        for (let i = 0; i < Object.keys(allRecipes).length; i++) {
-          //Variable declaration of a key must be done between []
-          switch (true) {
-            case allRecipes[Object.keys(allRecipes)[i]].RecipeLevelTable
-              .ClassJobLevel <= 50:
-              temp50Bucket = {
-                ...temp50Bucket,
-                [Object.keys(allRecipes)[i]]: {
-                  display: true,
-                  data: allRecipes[Object.keys(allRecipes)[i]],
-                },
-              };
-              break;
-            case allRecipes[Object.keys(allRecipes)[i]].RecipeLevelTable
-              .ClassJobLevel <= 60:
-              temp60Bucket = {
-                ...temp60Bucket,
-                [Object.keys(allRecipes)[i]]: {
-                  display: true,
-                  data: allRecipes[Object.keys(allRecipes)[i]],
-                },
-              };
-              break;
-            case allRecipes[Object.keys(allRecipes)[i]].RecipeLevelTable
-              .ClassJobLevel <= 70:
-              temp70Bucket = {
-                ...temp70Bucket,
-                [Object.keys(allRecipes)[i]]: {
-                  display: true,
-                  data: allRecipes[Object.keys(allRecipes)[i]],
-                },
-              };
-              break;
-            case allRecipes[Object.keys(allRecipes)[i]].RecipeLevelTable
-              .ClassJobLevel <= 80:
-              temp80Bucket = {
-                ...temp80Bucket,
-                [Object.keys(allRecipes)[i]]: {
-                  display: true,
-                  data: allRecipes[Object.keys(allRecipes)[i]],
-                },
-              };
-              break;
-            case allRecipes[Object.keys(allRecipes)[i]].RecipeLevelTable
-              .ClassJobLevel <= 90:
-              temp90Bucket = {
-                ...temp90Bucket,
-                [Object.keys(allRecipes)[i]]: {
-                  display: true,
-                  data: allRecipes[Object.keys(allRecipes)[i]],
-                },
-              };
-              break;
-            default:
-          }
-        }
-        setlv50Bucket(temp50Bucket);
-        setlv60Bucket(temp60Bucket);
-        setlv70Bucket(temp70Bucket);
-        setlv80Bucket(temp80Bucket);
-        setlv90Bucket(temp90Bucket);
-      }
-    };
-    asyncInCallback();
+    if (job !== null) {
+      fetch(`/api/get-recipes/${job}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setlv50Bucket(data.data["1-50"]);
+          setlv60Bucket(data.data["51-60"]);
+          setlv70Bucket(data.data["61-70"]);
+          setlv80Bucket(data.data["71-80"]);
+          setlv90Bucket(data.data["81-90"]);
+        })
+        .catch((err) => {
+          console.log("err", err);
+        });
+    }
   }, [job]);
 
+  useEffect(() => {
+    if (activeRecipeId !== null) {
+      fetch(`/api/get-recipe/${activeRecipeId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setActiveRecipe(data.data);
+        })
+        .catch((err) => {
+          console.log("err", err);
+        });
+    }
+  }, [activeRecipeId]);
+
   //just a check on contents for debug purposes
-  useEffect(() => {
-    console.log("lv50 size", Object.keys(lv50Bucket).length);
-  }, [lv50Bucket]);
-  useEffect(() => {
-    console.log("lv60 size", Object.keys(lv60Bucket).length);
-  }, [lv60Bucket]);
-  useEffect(() => {
-    console.log("lv70 size", Object.keys(lv70Bucket).length);
-  }, [lv70Bucket]);
-  useEffect(() => {
-    console.log("lv80 size", Object.keys(lv80Bucket).length);
-  }, [lv80Bucket]);
-  useEffect(() => {
-    console.log("lv90 size", Object.keys(lv90Bucket).length);
-  }, [lv90Bucket]);
+  // useEffect(() => {
+  //   console.log("lv50 size", Object.keys(lv50Bucket).length);
+  // }, [lv50Bucket]);
+  // useEffect(() => {
+  //   console.log("lv60 size", Object.keys(lv60Bucket).length);
+  // }, [lv60Bucket]);
+  // useEffect(() => {
+  //   console.log("lv70 size", Object.keys(lv70Bucket).length);
+  // }, [lv70Bucket]);
+  // useEffect(() => {
+  //   console.log("lv80 size", Object.keys(lv80Bucket).length);
+  // }, [lv80Bucket]);
+  // useEffect(() => {
+  //   console.log("lv90 size", Object.keys(lv90Bucket).length);
+  // }, [lv90Bucket]);
+  // useEffect(() => {
+  //   console.log("active recipe updated", activeRecipe);
+  // }, [activeRecipe]);
 
   const updateBookFilter = (type, isChecked) => {
     booksDispatch({ type: type, isChecked });
@@ -222,6 +163,8 @@ export const GlobalProvider = ({ children }) => {
         lv70Bucket,
         lv80Bucket,
         lv90Bucket,
+        setActiveRecipeId,
+        activeRecipe,
       }}
     >
       {children}
