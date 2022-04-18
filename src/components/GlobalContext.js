@@ -94,7 +94,7 @@ export const GlobalProvider = ({ children }) => {
   const [activeRecipe, setActiveRecipe] = useState(null);
 
   const [init, setInit] = useState(false);
-  const [fav, setFav] = useState([]);
+  const [fav, setFav] = useState({});
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export const GlobalProvider = ({ children }) => {
     fetch(`/api/get-user/0`)
       .then((res) => res.json())
       .then((data) => {
-        setFav(data.data.fav);
+        setFav({ ...data.data.fav });
         setInit(true);
       })
       .catch((err) => {
@@ -110,6 +110,7 @@ export const GlobalProvider = ({ children }) => {
       });
   }, []);
 
+  //Object containing favourited item objects
   useEffect(() => {
     if (init) {
       fetch(`/api/update-fav/`, {
@@ -118,7 +119,7 @@ export const GlobalProvider = ({ children }) => {
           "content-type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ id: 0, favArray: fav }),
+        body: JSON.stringify({ id: "0", favObject: { ...fav } }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -135,6 +136,7 @@ export const GlobalProvider = ({ children }) => {
     }
   }, [fav]);
 
+  //set each level bucket with object containing item objects
   useEffect(() => {
     if (job !== null) {
       fetch(`/api/get-recipes/${job}`)

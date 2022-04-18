@@ -6,29 +6,30 @@ import { writeStars } from "./utils";
 //Item will be the basic item returned from the api query
 const CollapsableMenuItem = ({ item }) => {
   const { setActiveRecipeId, fav, setFav } = useContext(GlobalContext);
-  const { isFav, setIsFav } = useState(false);
+  const [isFav, setIsFav] = useState(false);
 
   useEffect(() => {
-    for (let i = 0; i < fav.length; i++) {
-      if (fav[i] === item.ID) {
-        setIsFav(true);
-      }
-      break;
-    }
-  }, []);
+    setIsFav(fav.hasOwnProperty(item.ID));
+  }, [fav]);
 
   const handleItemClick = (e, id) => {
     setActiveRecipeId(id);
   };
 
   const handleFavClick = (e) => {
+    //apparently using stopPropagation isn't good practice?
     e.stopPropagation();
-    let tempArray = fav;
+    let tempObject = fav;
     if (isFav) {
       //remove from favourites
+      delete tempObject[item.ID];
+      setFav({ ...tempObject });
     } else {
       //add to favourites
+      tempObject[item.ID] = { display: true, data: item };
+      setFav({ ...tempObject });
     }
+    setIsFav(!isFav);
   };
 
   return (
@@ -44,7 +45,7 @@ const CollapsableMenuItem = ({ item }) => {
         </ItemInfoLv>
       </ItemInfoWrapper>
       <FavButtonWrapper>
-        <FavButton onClick={() => {}}>
+        <FavButton onClick={handleFavClick}>
           {isFav ? "Remove Favourite" : "Add Favourite"}
         </FavButton>
       </FavButtonWrapper>
@@ -78,9 +79,10 @@ const ItemInfoName = styled.div``;
 const ItemInfoLv = styled.div``;
 
 const FavButtonWrapper = styled.div`
-  align-self: flex-end;
+  display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: flex-end;
+  flex-grow: 2;
 `;
 const FavButton = styled.button``;
 

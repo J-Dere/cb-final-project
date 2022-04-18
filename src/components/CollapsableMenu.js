@@ -16,18 +16,20 @@ const CollapsableMenu = ({ label, items }) => {
     setIsActive(!isActive);
   };
   return (
-    <Wrapper isActive={isActive}>
+    <>
       <MenuLabel onClick={handleMenuClick}>
         <div>{label}</div>
         <div>{isActive ? "-" : "+"}</div>
       </MenuLabel>
-      {isActive &&
-        Object.keys(items).map((itemKey) => {
-          return (
-            <CollapsableMenuItem key={itemKey} item={items[itemKey].data} />
-          );
-        })}
-    </Wrapper>
+      <Wrapper isActive={isActive}>
+        {isActive &&
+          Object.keys(items).map((itemKey) => {
+            return (
+              <CollapsableMenuItem key={itemKey} item={items[itemKey].data} />
+            );
+          })}
+      </Wrapper>
+    </>
   );
 };
 
@@ -35,6 +37,7 @@ const Wrapper = styled.div`
   max-width: 500px;
   background-color: #989898;
   padding-bottom: ${(props) => props.isActive && "5px"};
+  overflow-y: ${(props) => props.isActive && "scroll"};
 `;
 const MenuLabel = styled.div`
   display: flex;

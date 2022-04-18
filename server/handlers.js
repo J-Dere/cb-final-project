@@ -117,13 +117,13 @@ const handleGetUser = async (req, res) => {
 };
 
 const handleUpdateFav = async (req, res) => {
-  const { favArray, id } = req.body;
+  const { favObject, id } = req.body;
   const client = new MongoClient(MONGO_URI, options);
 
   try {
     await client.connect();
     const db = client.db("cb-final-project");
-    const updateData = { fav: favArray };
+    const updateData = { fav: favObject };
 
     const updateResult = await db
       .collection("users")
