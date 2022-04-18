@@ -93,6 +93,48 @@ export const GlobalProvider = ({ children }) => {
   const [activeRecipeId, setActiveRecipeId] = useState(null);
   const [activeRecipe, setActiveRecipe] = useState(null);
 
+  const [init, setInit] = useState(false);
+  const [fav, setFav] = useState([]);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    //only using one user as proof of concept that database can be used
+    fetch(`/api/get-user/0`)
+      .then((res) => res.json())
+      .then((data) => {
+        setFav(data.data.fav);
+        setInit(true);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (init) {
+      fetch(`/api/update-fav/`, {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ id: 0, favArray: fav }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.data.success) {
+            setError(true);
+          } else {
+            setError(false);
+          }
+        })
+        .catch((err) => {
+          console.log("err", err);
+          setError(true);
+        });
+    }
+  }, [fav]);
+
   useEffect(() => {
     if (job !== null) {
       fetch(`/api/get-recipes/${job}`)
@@ -165,6 +207,9 @@ export const GlobalProvider = ({ children }) => {
         lv90Bucket,
         setActiveRecipeId,
         activeRecipe,
+        fav,
+        setFav,
+        error,
       }}
     >
       {children}

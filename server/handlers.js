@@ -94,4 +94,59 @@ const handleGetRecipe = async (req, res) => {
   return sendResponse(res, 200, recipe);
 };
 
-module.exports = { handleGetRecipe, handleGetRecipes };
+const handleGetUser = async (req, res) => {
+  const id = req.params.id;
+  const client = new MongoClient(MONGO_URI, options);
+
+  let user;
+  try {
+    await client.connect();
+    const db = client.db("cb-final-project");
+    user = await db.collection("users").findOne({ _id: id });
+
+    if (!user) {
+      return sendResponse(res, 200, id, "user not found");
+    }
+  } catch (err) {
+    console.log("getUser error", err.stack);
+    return sendResponse(res, 400, id, err.message);
+  } finally {
+    await client.close();
+  }
+  return sendResponse(res, 200, user, `user for id ${id}`);
+};
+
+const handleUpdateFav = async (req, res) => {
+  const { favArray, id } = req.body;
+  const client = new MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("cb-final-project");
+    const updateData = { fav: favArray };
+
+    const updateResult = await db
+      .collection("users")
+      .updateOne({ _id: id }, { $set: updateData });
+    if (updateResult.matchedCount === 0) {
+      return sendResponse(res, 400, req.body, "user not found");
+    }
+    if (updateResult.modifiedCount === 0) {
+      return sendResponse(res, 400, req.body, "user was not updated");
+    }
+
+    return sendResponse(res, 200, { success: true }, "user was updated");
+  } catch (err) {
+    console.log("update fav error", err.stack);
+    return sendResponse(res, 400, req.body, err.message);
+  } finally {
+    await client.close();
+  }
+};
+
+module.exports = {
+  handleGetRecipe,
+  handleGetRecipes,
+  handleGetUser,
+  handleUpdateFav,
+};

@@ -1,20 +1,34 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
 import { GlobalContext } from "./GlobalContext";
+import { writeStars } from "./utils";
 
 //Item will be the basic item returned from the api query
 const CollapsableMenuItem = ({ item }) => {
-  const { setActiveRecipeId } = useContext(GlobalContext);
-  const writeStars = (numStars) => {
-    let starString = "";
-    for (let i = 0; i < numStars; i++) {
-      starString = starString.concat("*");
+  const { setActiveRecipeId, fav, setFav } = useContext(GlobalContext);
+  const { isFav, setIsFav } = useState(false);
+
+  useEffect(() => {
+    for (let i = 0; i < fav.length; i++) {
+      if (fav[i] === item.ID) {
+        setIsFav(true);
+      }
+      break;
     }
-    return starString;
-  };
+  }, []);
 
   const handleItemClick = (e, id) => {
     setActiveRecipeId(id);
+  };
+
+  const handleFavClick = (e) => {
+    e.stopPropagation();
+    let tempArray = fav;
+    if (isFav) {
+      //remove from favourites
+    } else {
+      //add to favourites
+    }
   };
 
   return (
@@ -29,6 +43,11 @@ const CollapsableMenuItem = ({ item }) => {
           )}
         </ItemInfoLv>
       </ItemInfoWrapper>
+      <FavButtonWrapper>
+        <FavButton onClick={() => {}}>
+          {isFav ? "Remove Favourite" : "Add Favourite"}
+        </FavButton>
+      </FavButtonWrapper>
     </MenuItem>
   );
 };
@@ -57,5 +76,12 @@ const ItemInfoWrapper = styled.div`
 `;
 const ItemInfoName = styled.div``;
 const ItemInfoLv = styled.div``;
+
+const FavButtonWrapper = styled.div`
+  align-self: flex-end;
+  align-items: center;
+  justify-content: right;
+`;
+const FavButton = styled.button``;
 
 export default CollapsableMenuItem;
