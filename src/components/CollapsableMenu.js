@@ -5,15 +5,24 @@ import { GlobalContext } from "./GlobalContext";
 
 //items will be an object containing objects
 const CollapsableMenu = ({ label, items }) => {
-  const { job } = useContext(GlobalContext);
+  const { job, globalMenuActive, setGlobalMenuActive } =
+    useContext(GlobalContext);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
     setIsActive(false);
   }, [job]);
 
-  const handleMenuClick = () => {
-    setIsActive(!isActive);
+  useEffect(() => {
+    if (isActive && !globalMenuActive) {
+      setIsActive(false);
+    }
+  }, [globalMenuActive]);
+
+  const handleMenuClick = async () => {
+    await setGlobalMenuActive(false);
+    await setIsActive(!isActive);
+    await setGlobalMenuActive(true);
   };
   return (
     <>
@@ -22,12 +31,24 @@ const CollapsableMenu = ({ label, items }) => {
         <div>{isActive ? "-" : "+"}</div>
       </MenuLabel>
       <Wrapper isActive={isActive}>
-        {isActive &&
-          Object.keys(items).map((itemKey) => {
-            return (
-              <CollapsableMenuItem key={itemKey} item={items[itemKey].data} />
-            );
-          })}
+        {isActive && (
+          <StyledUl>
+            {Object.keys(items).map((itemKey) => {
+              return (
+                <StyledLi key={itemKey}>
+                  {/*This should be done in a more elegant manner for larger number of filters */}
+                  {items[itemKey].bookDisplay &&
+                    items[itemKey].equipDisplay && (
+                      <CollapsableMenuItem
+                        key={itemKey}
+                        item={items[itemKey].data}
+                      />
+                    )}
+                </StyledLi>
+              );
+            })}
+          </StyledUl>
+        )}
       </Wrapper>
     </>
   );
@@ -46,6 +67,15 @@ const MenuLabel = styled.div`
   cursor: pointer;
   background-color: darkgray;
   padding: 0 5px;
+`;
+
+const StyledUl = styled.ul`
+  padding: 0;
+  margin: 0;
+`;
+
+const StyledLi = styled.li`
+  list-style-type: none;
 `;
 
 export default CollapsableMenu;

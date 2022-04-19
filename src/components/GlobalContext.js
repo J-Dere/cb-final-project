@@ -1,21 +1,21 @@
 import { createContext, useEffect, useState, useReducer } from "react";
+import { changeDisplayPropOfBucket, getBookIdByJob } from "./utils";
 export const GlobalContext = createContext();
 
 const initialEquipmentState = {
-  head: true,
-  body: true,
-  hands: true,
-  legs: true,
-  feet: true,
-  earrings: true,
-  necklace: true,
+  head: true, //id=34
+  body: true, //id=35
+  hands: true, //id=37
+  legs: true, //id=36
+  feet: true, //id=38
+  earrings: true, //id=41
+  necklace: true, //id=40
 };
 
 const initialBooksState = {
-  noBooks: false,
+  noBook: true, //id=null
   bookDemi: true,
   book1: true,
-  book2: true,
   book3: true,
   book4: true,
   book5: true,
@@ -27,12 +27,12 @@ const initialBooksState = {
 
 const booksReducer = (state, action) => {
   switch (action.type) {
+    case "noBook":
+      return { ...state, noBook: action.isChecked };
     case "bookDemi":
       return { ...state, bookDemi: action.isChecked };
     case "book1":
       return { ...state, book1: action.isChecked };
-    case "book2":
-      return { ...state, book2: action.isChecked };
     case "book3":
       return { ...state, book3: action.isChecked };
     case "book4":
@@ -89,6 +89,8 @@ export const GlobalProvider = ({ children }) => {
   const [lv70Bucket, setlv70Bucket] = useState({});
   const [lv80Bucket, setlv80Bucket] = useState({});
   const [lv90Bucket, setlv90Bucket] = useState({});
+
+  const [globalMenuActive, setGlobalMenuActive] = useState(false);
 
   const [activeRecipeId, setActiveRecipeId] = useState(null);
   const [activeRecipe, setActiveRecipe] = useState(null);
@@ -167,25 +169,84 @@ export const GlobalProvider = ({ children }) => {
     }
   }, [activeRecipeId]);
 
-  //just a check on contents for debug purposes
-  // useEffect(() => {
-  //   console.log("lv50 size", Object.keys(lv50Bucket).length);
-  // }, [lv50Bucket]);
-  // useEffect(() => {
-  //   console.log("lv60 size", Object.keys(lv60Bucket).length);
-  // }, [lv60Bucket]);
-  // useEffect(() => {
-  //   console.log("lv70 size", Object.keys(lv70Bucket).length);
-  // }, [lv70Bucket]);
-  // useEffect(() => {
-  //   console.log("lv80 size", Object.keys(lv80Bucket).length);
-  // }, [lv80Bucket]);
-  // useEffect(() => {
-  //   console.log("lv90 size", Object.keys(lv90Bucket).length);
-  // }, [lv90Bucket]);
-  // useEffect(() => {
-  //   console.log("active recipe updated", activeRecipe);
-  // }, [activeRecipe]);
+  useEffect(() => {
+    //check equip filters
+    //show items that match filters
+    Object.keys(equipsFilters).forEach((key) => {
+      //if filter is checked
+      let id = 0;
+      switch (true) {
+        case key === "head":
+          id = 34;
+          break;
+        case key === "body":
+          id = 35;
+          break;
+        case key === "hands":
+          id = 37;
+          break;
+        case key === "legs":
+          id = 36;
+          break;
+        case key === "feet":
+          id = 38;
+          break;
+        case key === "earrings":
+          id = 41;
+          break;
+        case key === "necklace":
+          id = 40;
+          break;
+        default:
+      }
+      if (equipsFilters[key]) {
+        //display all items that match filter
+        setlv50Bucket(changeDisplayPropOfBucket(lv50Bucket, true, "equip", id));
+        setlv60Bucket(changeDisplayPropOfBucket(lv60Bucket, true, "equip", id));
+        setlv70Bucket(changeDisplayPropOfBucket(lv70Bucket, true, "equip", id));
+        setlv80Bucket(changeDisplayPropOfBucket(lv80Bucket, true, "equip", id));
+        setlv90Bucket(changeDisplayPropOfBucket(lv90Bucket, true, "equip", id));
+      } else {
+        //do not display all items that match filter
+        setlv50Bucket(
+          changeDisplayPropOfBucket(lv50Bucket, false, "equip", id)
+        );
+        setlv60Bucket(
+          changeDisplayPropOfBucket(lv60Bucket, false, "equip", id)
+        );
+        setlv70Bucket(
+          changeDisplayPropOfBucket(lv70Bucket, false, "equip", id)
+        );
+        setlv80Bucket(
+          changeDisplayPropOfBucket(lv80Bucket, false, "equip", id)
+        );
+        setlv90Bucket(
+          changeDisplayPropOfBucket(lv90Bucket, false, "equip", id)
+        );
+      }
+    });
+
+    //check book filters (ignore items that are already not displayed)
+    //book ids are based on job
+    Object.keys(booksFilters).forEach((key) => {
+      let id = getBookIdByJob(job, key);
+      if (booksFilters[key]) {
+        //display all items that match filter
+        setlv50Bucket(changeDisplayPropOfBucket(lv50Bucket, true, "book", id));
+        setlv60Bucket(changeDisplayPropOfBucket(lv60Bucket, true, "book", id));
+        setlv70Bucket(changeDisplayPropOfBucket(lv70Bucket, true, "book", id));
+        setlv80Bucket(changeDisplayPropOfBucket(lv80Bucket, true, "book", id));
+        setlv90Bucket(changeDisplayPropOfBucket(lv90Bucket, true, "book", id));
+      } else {
+        //do not display all items that match filter
+        setlv50Bucket(changeDisplayPropOfBucket(lv50Bucket, false, "book", id));
+        setlv60Bucket(changeDisplayPropOfBucket(lv60Bucket, false, "book", id));
+        setlv70Bucket(changeDisplayPropOfBucket(lv70Bucket, false, "book", id));
+        setlv80Bucket(changeDisplayPropOfBucket(lv80Bucket, false, "book", id));
+        setlv90Bucket(changeDisplayPropOfBucket(lv90Bucket, false, "book", id));
+      }
+    });
+  }, [job, booksFilters, equipsFilters]);
 
   const updateBookFilter = (type, isChecked) => {
     booksDispatch({ type: type, isChecked });
@@ -200,6 +261,8 @@ export const GlobalProvider = ({ children }) => {
       value={{
         job,
         setJob,
+        equipsFilters,
+        booksFilters,
         updateBookFilter,
         updateEquipFilter,
         lv50Bucket,
@@ -207,6 +270,8 @@ export const GlobalProvider = ({ children }) => {
         lv70Bucket,
         lv80Bucket,
         lv90Bucket,
+        globalMenuActive,
+        setGlobalMenuActive,
         setActiveRecipeId,
         activeRecipe,
         fav,

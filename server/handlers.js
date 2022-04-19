@@ -10,7 +10,6 @@ const sendResponse = (res, status, data, message = "") => {
 };
 
 const handleGetRecipes = async (req, res) => {
-  console.log("calling get recipes");
   const jobID = req.params.jobID;
   let queryString = "";
   //set job in query
@@ -30,7 +29,8 @@ const handleGetRecipes = async (req, res) => {
         temp50Bucket = {
           ...temp50Bucket,
           [Object.keys(allRecipes)[i]]: {
-            display: true,
+            equipDisplay: true,
+            bookDisplay: true,
             data: allRecipes[Object.keys(allRecipes)[i]],
           },
         };
@@ -40,7 +40,8 @@ const handleGetRecipes = async (req, res) => {
         temp60Bucket = {
           ...temp60Bucket,
           [Object.keys(allRecipes)[i]]: {
-            display: true,
+            equipDisplay: true,
+            bookDisplay: true,
             data: allRecipes[Object.keys(allRecipes)[i]],
           },
         };
@@ -50,7 +51,8 @@ const handleGetRecipes = async (req, res) => {
         temp70Bucket = {
           ...temp70Bucket,
           [Object.keys(allRecipes)[i]]: {
-            display: true,
+            equipDisplay: true,
+            bookDisplay: true,
             data: allRecipes[Object.keys(allRecipes)[i]],
           },
         };
@@ -60,7 +62,8 @@ const handleGetRecipes = async (req, res) => {
         temp80Bucket = {
           ...temp80Bucket,
           [Object.keys(allRecipes)[i]]: {
-            display: true,
+            equipDisplay: true,
+            bookDisplay: true,
             data: allRecipes[Object.keys(allRecipes)[i]],
           },
         };
@@ -70,7 +73,8 @@ const handleGetRecipes = async (req, res) => {
         temp90Bucket = {
           ...temp90Bucket,
           [Object.keys(allRecipes)[i]]: {
-            display: true,
+            equipDisplay: true,
+            bookDisplay: true,
             data: allRecipes[Object.keys(allRecipes)[i]],
           },
         };

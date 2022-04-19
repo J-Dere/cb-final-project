@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import styled from "styled-components";
+import Filters from "./Filters";
 import { GlobalContext } from "./GlobalContext";
 import RecipesViewer from "./RecipesViewer";
 
@@ -22,6 +23,7 @@ function App() {
         <option value={13}>Weaver</option>
         <option value={14}>Alchemist</option>
       </select>
+      <Filters />
       <RecipesViewer />
     </Wrapper>
   );

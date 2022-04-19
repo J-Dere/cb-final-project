@@ -37,7 +37,6 @@ const getItemsFromAPI = async (query) => {
   } catch (err) {
     console.log("err", err);
   }
-  console.log(Object.keys(container).length);
   return container;
 };
 
