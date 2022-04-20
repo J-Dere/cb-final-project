@@ -26,7 +26,11 @@ const CollapsableMenuItem = ({ item }) => {
       setFav({ ...tempObject });
     } else {
       //add to favourites
-      tempObject[item.ID] = { display: true, data: item };
+      tempObject[item.ID] = {
+        equipDisplay: true,
+        bookDisplay: true,
+        data: item,
+      };
       setFav({ ...tempObject });
     }
     setIsFav(!isFav);
